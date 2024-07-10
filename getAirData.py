@@ -3,7 +3,7 @@ import requests
 def fetch_data():
     url = 'http://apis.data.go.kr/B552584/ArpltnStatsSvc/getCtprvnMesureLIst'
     params ={
-        'serviceKey' : 'MQrOmcyT4jVjtpceKVFlzVAV7g2Aec3Wh1hvr2gw086NcElfzKtX93eY/qT9UG4dsTB/J/VnqjOS0RzSrnLdag==',
+        'serviceKey' : 'API_KEY',
         'returnType' : 'json',
         'numOfRows' : '100',
         'pageNo' : '1',
@@ -53,9 +53,36 @@ def filter_data_by_date_and_region(data, date, region):
     region_data = [{region: item[region], 'dataTime': item['dataTime']} for item in filtered_by_date if region in item]
     return region_data
 
+def assess_air_quality(data, region):
+    """
+    특정 지역의 미세먼지 농도에 따라 공기의 질을 평가하는 함수.
+
+    Args:
+    data (list of dict): 필터링된 데이터.
+    region (str): 평가할 지역.
+
+    Returns:
+    str: 공기의 질 평가 결과.
+    """
+    if not data:
+        return "데이터가 없습니다."
+    try:
+        pm10_value = int(data[0][region])  # 최신 데이터의 PM10 값을 추출
+        if pm10_value <= 30:
+            return "맑음"
+        elif 31 <= pm10_value <= 80:
+            return "보통"
+        else:
+            return "나쁨"
+    except KeyError:
+        return "지역 정보가 없습니다."
+    except ValueError:
+        return "미세먼지 수치를 확인할 수 없습니다."
+
 # 사용 예
-full_data = fetch_data()  # 전체 데이터 가져오기
-specific_date = '2024-06-10'  # 필터링할 날짜
-specific_region = 'seoul'  # 필터링할 지역
-filtered_data = filter_data_by_date_and_region(full_data, specific_date, specific_region)  # 특정 날짜와 지역 데이터 필터링
-print(filtered_data)
+full_data = fetch_data()
+specific_date = '2024-06-10'
+specific_region = 'seoul'
+filtered_data = filter_data_by_date_and_region(full_data, specific_date, specific_region)
+air_quality = assess_air_quality(filtered_data, specific_region)
+print(f"{specific_date} {specific_region}의 공기질: {air_quality}")
