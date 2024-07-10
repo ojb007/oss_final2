@@ -37,7 +37,25 @@ def filter_data_by_date(data, date):
     items = data['response']['body']['items']
     return [item for item in items if item['dataTime'].startswith(date)]
 
+def filter_data_by_date_and_region(data, date, region):
+    """
+    API에서 받은 데이터 중 특정 날짜와 지역에 해당하는 데이터만 필터링하는 함수.
+
+    Args:
+    data (dict): API로부터 받은 전체 데이터.
+    date (str): 필터링할 날짜 (예: '2024-07-09').
+    region (str): 필터링할 지역 (예: 'seoul').
+
+    Returns:
+    dict: 특정 날짜와 지역에 해당하는 데이터.
+    """
+    filtered_by_date = filter_data_by_date(data, date)
+    region_data = [{region: item[region], 'dataTime': item['dataTime']} for item in filtered_by_date if region in item]
+    return region_data
+
+# 사용 예
 full_data = fetch_data()  # 전체 데이터 가져오기
-specific_date = '2024-06-10'  # 필터링할 날짜 최근 한달까지 가능
-filtered_data = filter_data_by_date(full_data, specific_date)  # 특정 날짜 데이터 필터링
+specific_date = '2024-06-10'  # 필터링할 날짜
+specific_region = 'seoul'  # 필터링할 지역
+filtered_data = filter_data_by_date_and_region(full_data, specific_date, specific_region)  # 특정 날짜와 지역 데이터 필터링
 print(filtered_data)
