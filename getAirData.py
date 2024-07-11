@@ -1,26 +1,6 @@
 import requests
 from air_korea_api import air_condition_realtime
 
-def fetch_data():
-    url = 'http://apis.data.go.kr/B552584/ArpltnStatsSvc/getCtprvnMesureLIst'
-    params ={
-        'serviceKey' : 'R+8s9BHhcob1+/0e3PKTTRN7mTgLkVRHoS/rKZ2fRHhgQcvrffI0TvaHzh/406d2oF1iEU16aGKK5MJmimE9PA==',
-        'returnType' : 'json',
-        'numOfRows' : '100',
-        'pageNo' : '1',
-        'itemCode' : 'PM10',
-        'dataGubun' : 'DAILY',
-        'searchCondition' : 'MONTH'
-        }
-    try:
-        response = requests.get(url, params)
-        response.raise_for_status()  # HTTP 에러 발생 시 예외를 발생시킵니다.
-        return response.json()       # JSON 형태로 데이터를 파싱하여 반환합니다.
-    except requests.exceptions.HTTPError as err:
-        print(f"HTTP 에러 발생: {err}")
-    except requests.exceptions.RequestException as err:
-        print(f"요청 에러 발생: {err}")
-
 # fullData = fetch_data()
 # print(fullData)
 
@@ -81,9 +61,3 @@ def assess_air_quality(data, region):
         return "미세먼지 수치를 확인할 수 없습니다."
 
 # 사용 예
-full_data = air_condition_realtime('PM10', 'DAILY')
-specific_date = '2024-06-10'
-specific_region = 'seoul'
-filtered_data = filter_data_by_date_and_region(full_data, specific_date, specific_region)
-air_quality = assess_air_quality(filtered_data, specific_region)
-print(f"{specific_date} {specific_region}의 공기질: {air_quality}")
