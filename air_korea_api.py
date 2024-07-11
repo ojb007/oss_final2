@@ -22,11 +22,11 @@ def air_condition_city_realtime(loc) :
     result = json.loads(response.content)["response"]["body"]['items']
     return result
 
-def air_condition_except_seoul_realtime(item) :
-    #params : 필요한 항목 (ex: 'SO2', 'CO', 'O3', 'NO2', 'PM10', 'PM2.5')
+def air_condition_realtime(item, option) :
+    #params : 필요한 항목 (ex: 'SO2', 'CO', 'O3', 'NO2', 'PM10', 'PM2.5'), option(HOUR or DAILY)
     #return : 실시간(현재부터 24시간 전까지) 모든 시도(서울 제외)의 해당 항목의 농도 dictionary
     url = 'http://apis.data.go.kr/B552584/ArpltnStatsSvc/getCtprvnMesureLIst'
-    params ={'serviceKey' : 'R+8s9BHhcob1+/0e3PKTTRN7mTgLkVRHoS/rKZ2fRHhgQcvrffI0TvaHzh/406d2oF1iEU16aGKK5MJmimE9PA==', 'returnType' : 'json', 'numOfRows' : '100', 'pageNo' : '1', 'itemCode' : item, 'dataGubun' : 'HOUR', 'searchCondition' : 'WEEK' }
+    params ={'serviceKey' : 'R+8s9BHhcob1+/0e3PKTTRN7mTgLkVRHoS/rKZ2fRHhgQcvrffI0TvaHzh/406d2oF1iEU16aGKK5MJmimE9PA==', 'returnType' : 'json', 'numOfRows' : '100', 'pageNo' : '1', 'itemCode' : item, 'dataGubun' : option, 'searchCondition' : 'MONTH' }
 
     response = requests.get(url, params=params)
     result = json.loads(response.content)["response"]["body"]['items']

@@ -1,9 +1,10 @@
 import requests
+from air_korea_api import air_condition_realtime
 
 def fetch_data():
     url = 'http://apis.data.go.kr/B552584/ArpltnStatsSvc/getCtprvnMesureLIst'
     params ={
-        'serviceKey' : 'API_KEY',
+        'serviceKey' : 'R+8s9BHhcob1+/0e3PKTTRN7mTgLkVRHoS/rKZ2fRHhgQcvrffI0TvaHzh/406d2oF1iEU16aGKK5MJmimE9PA==',
         'returnType' : 'json',
         'numOfRows' : '100',
         'pageNo' : '1',
@@ -34,7 +35,7 @@ def filter_data_by_date(data, date):
     Returns:
     list: 특정 날짜에 해당하는 데이터 목록.
     """
-    items = data['response']['body']['items']
+    items = data
     return [item for item in items if item['dataTime'].startswith(date)]
 
 def filter_data_by_date_and_region(data, date, region):
@@ -80,7 +81,7 @@ def assess_air_quality(data, region):
         return "미세먼지 수치를 확인할 수 없습니다."
 
 # 사용 예
-full_data = fetch_data()
+full_data = air_condition_realtime('PM10', 'DAILY')
 specific_date = '2024-06-10'
 specific_region = 'seoul'
 filtered_data = filter_data_by_date_and_region(full_data, specific_date, specific_region)
