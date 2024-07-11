@@ -50,7 +50,3 @@ def air_condition_realtime(item, option) :
         print(f"HTTP 에러 발생: {err}")
     except requests.exceptions.RequestException as err:
         print(f"요청 에러 발생: {err}")
-
-test = air_condition_realtime('PM10', 'DAILY')
-
-print(test)
