@@ -2,27 +2,13 @@ import requests
 import json
 from statistics import stdev
 import pandas as pd
+from air_korea_api import air_condition_period_only_seoul
 
-def air_condition_period_only_seoul(loc, init, end):
-    url = 'http://apis.data.go.kr/B552584/ArpltnStatsSvc/getMsrstnAcctoRDyrg'
-    params = {
-        'serviceKey': 'R+8s9BHhcob1+/0e3PKTTRN7mTgLkVRHoS/rKZ2fRHhgQcvrffI0TvaHzh/406d2oF1iEU16aGKK5MJmimE9PA==',
-        'returnType': 'json',
-        'numOfRows': '100',
-        'pageNo': '1',
-        'inqBginDt': init,
-        'inqEndDt': end,
-        'msrstnName': loc
-    }
-    response = requests.get(url, params=params)
-    result = json.loads(response.content)["response"]["body"]['items']
-    return result
-
-def calculate_pm10_variation(locations, init, end):
+def calculate_item_variation(locations, req_item, init, end):
     variations = {}
     for loc in locations:
         data = air_condition_period_only_seoul(loc, init, end)
-        pm10_values = [int(item['pm10Value']) for item in data if item['pm10Value'] != '-']
+        pm10_values = [int(item[req_item]) for item in data if item[req_item] != '-']
         if pm10_values:
             variation = stdev(pm10_values)
             variations[loc] = variation
@@ -30,6 +16,11 @@ def calculate_pm10_variation(locations, init, end):
 
 def main():
     # 사용자로부터 시작일과 종료일 입력받기
+    req_item = input("원하는 항목을 입력하세요 (so2, co, o3, no2, pm10, pm2.5): ")
+    if req_item == "pm2.5" :
+        req_item = "pm25Value"
+    else :
+        req_item = req_item + "value"
     init_date = input("시작일을 입력하세요 (예: 20240701): ")
     end_date = input("종료일을 입력하세요 (예: 20240709): ")
 
@@ -37,14 +28,14 @@ def main():
     seoul_districts = ["강남구", "강동구", "강북구", "강서구", "관악구", "광진구", "구로구", "금천구", "노원구", "도봉구", "동대문구", "동작구", "마포구", "서대문구", "서초구", "성동구", "성북구", "송파구", "양천구", "영등포구", "용산구", "은평구", "종로구", "중구", "중랑구"]
 
     # 각 구의 PM10 변동성 계산
-    pm10_variations = calculate_pm10_variation(seoul_districts, init_date, end_date)
+    item_variations = calculate_item_variation(seoul_districts, req_item, init_date, end_date)
 
     # PM10 변동성에 따라 구를 내림차순으로 정렬하고 상위 5개 구 출력
-    sorted_variations = sorted(pm10_variations.items(), key=lambda item: item[1], reverse=True)
+    sorted_variations = sorted(item_variations.items(), key=lambda item: item[1], reverse=True)
     top_5_districts = sorted_variations[:5]
 
     # pandas DataFrame으로 변환
-    df = pd.DataFrame(top_5_districts, columns=['구', 'PM10 변동성'])
+    df = pd.DataFrame(top_5_districts, columns=['구', 'item 변동성'])
     
     print("미세먼지(PM10) 변동성이 가장 큰 상위 5개 구:")
     print(df)
